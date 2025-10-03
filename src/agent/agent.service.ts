@@ -21,7 +21,16 @@ Always respond ONLY in valid JSON, without extra commentary.
 Response must follow this schema exactly:
 
 {
-  "flights": [
+  "departure_flights": [
+    {
+      "id": "string",
+      "airline": "string",
+      "departure_time": "string",
+      "arrival_time": "string",
+      "price": "string"
+    }
+  ],
+  "return_flights": [
     {
       "id": "string",
       "airline": "string",
@@ -63,14 +72,16 @@ Response must follow this schema exactly:
 }
 
 Rules:
-1. If ANY of these are missing: departure city, destination city, departure date, return date, number of travelers, theme of the trip → ask ONLY for the missing details in Turkish (not JSON).  
-2. If ALL are present → call all MCP tools in parallel in one turn and return:
-   - all flight results (prefer direct flights when available)  
+1. Never use web search.
+2. If ANY of these are missing: departure city, destination city, departure date, return date, number of travelers, theme of the trip → ask ONLY for the missing details in Turkish (not JSON).  
+3. If ALL are present → call all MCP tools in parallel in one turn and return:
+   - all departure flight results (prefer direct flights when available)  
+   - all return flight results (prefer direct flights when available)  
    - all accommodation results for the stay (include different price ranges)  
    - all activites and attractions and sort for relevant theme and dates 
-3. Return the raw results in the JSON schema above, do not filter or summarize.  
-4. Always answer in Turkish.  
-5. Output MUST be raw JSON, without backticks or markdown.
+4. Return the raw results in the JSON schema above, do not filter or summarize.  
+5. Always answer in Turkish.  
+6. Output MUST be raw JSON, without backticks or markdown.
 `,
       mcpServers: [enUygun, attractionsActivites],
       modelSettings: { parallelToolCalls: true },
