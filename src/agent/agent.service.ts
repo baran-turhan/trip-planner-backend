@@ -9,49 +9,91 @@ export class AgentService {
       name: 'Wingie Enuygun Travel Planner',
     });
 
-    const emir = new MCPServerStreamableHttp({
+    const attractionsActivites = new MCPServerStreamableHttp({
       url: 'https://mcp-enuygun-fs.onrender.com/mcp',
-      name: 'Attraction Finder',
+      name: 'Attraction and Activity Finder',
     });
 
     const agent = new Agent({
       name: 'Wingie Enuygun Travel Planner',
       instructions: `You are a travel planning assistant for Wingie Enuygun.  
-Your primary task is to provide users with flight and accommodation recommendations.  
+Always respond ONLY in valid JSON, without extra commentary.  
+Response must follow this schema exactly:
 
-Rules:  
-1. Before responding, always check if the user has provided ALL of the following information:  
-   - Departure city  
-   - Destination city  
-   - Departure date  
-   - Return date  
-   - Number of travelers  
-   - Theme of the travel
+{
+  "flights": [
+    {
+      "id": "string",
+      "airline": "string",
+      "departure_time": "string",
+      "arrival_time": "string",
+      "price": "string"
+    }
+  ],
+  "accommodations": [
+    {
+      "id": "string",
+      "name": "string",
+      "location": "string",
+      "price_per_night": "string",
+      "image_url": "string"
+    }
+  ],
+  "activites": [
+    {
+      "id": "string",
+      "name": "string",
+      "location": "string",
+      "price_per_night": "string",
+      "image_url": "string",
+      "link_url" "string"
+    }
+  ],
+  "attractions": [
+    {
+      "id": "string",
+      "name": "string",
+      "location": "string",
+      "price": "string",
+      "image_url": "string",
+      "link_url": "string"
+    }
+  ],
+  "comments": "string"
+}
 
-2. If ANY of these details are missing, do not respond at all. Kindly ask for the missing details. 
-
-3. If ALL required details are present:  
-   - First, suggest suitable flights, giving preference to direct flights when possible.  
-   - Second, suggest accommodations for the stay, including options in different price ranges.  
-   - Third, find the attraction in the destination city based on the theme of the travel and return the image links and attraction urls using the Attraction Finder mcp tool.
-   - Keep responses concise, clear, and user-friendly.
-   - **Return flights, accommodations, attractions and your own comments in JSON format**
-
-4. **Always respond in Turkish.**`,
-      mcpServers: [enUygun, emir],
+Rules:
+1. If ANY of these are missing: departure city, destination city, departure date, return date, number of travelers, theme of the trip → ask ONLY for the missing details in Turkish (not JSON).  
+2. If ALL are present → call all MCP tools in parallel in one turn and return:
+   - all flight results (prefer direct flights when available)  
+   - all accommodation results for the stay (include different price ranges)  
+   - all activites and attractions and sort for relevant theme and dates 
+3. Return the raw results in the JSON schema above, do not filter or summarize.  
+4. Always answer in Turkish.  
+5. Output MUST be raw JSON, without backticks or markdown.
+`,
+      mcpServers: [enUygun, attractionsActivites],
+      modelSettings: { parallelToolCalls: true },
     });
 
     try {
       await enUygun.connect();
-      await emir.connect();
+      await attractionsActivites.connect();
 
       const result = await run(agent, prompt);
 
-      console.log(result.finalOutput);
-      return result.finalOutput;
+      let parsed: any;
+      try {
+        parsed = JSON.parse(result.finalOutput);
+      } catch (err) {
+        console.error('JSON parse hatası:', err);
+        throw new Error('Modelden geçerli JSON gelmedi');
+      }
+
+      return parsed;
     } finally {
       await enUygun.close();
-      await emir.close();
+      await attractionsActivites.close();
     }
   }
 }
