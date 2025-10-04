@@ -1,99 +1,254 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🌍 Trip Planner Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Wingie Enuygun için geliştirilmiş akıllı seyahat planlama backend API'si. Bu proje, kullanıcıların seyahat planları oluşturabilmesi için uçuş, konaklama, aktivite ve cazibe merkezi önerilerini sunar.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Özellikler
 
-## Description
+- **Akıllı Seyahat Planlaması**: OpenAI Agents ve MCP (Model Context Protocol) kullanarak otomatik seyahat planı oluşturma
+- **Multi-Platform Entegrasyon**: 
+  - Wingie Enuygun uçuş ve konaklama servisleri
+  - Aktivite ve cazibe merkezi önerileri
+- **Kapsamlı Loglama**: Winston ile detaylı kullanıcı aktivite izleme
+- **JSON Tabanlı Yanıtlar**: Strukturlu ve öngörülebilir API yanıtları
+- **Paralel İşlem**: Tüm servislerden eş zamanlı veri çekme
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🏗️ Teknoloji Stack
 
-## Project setup
+- **Framework**: NestJS (TypeScript)
+- **AI/ML**: OpenAI Agents, MCP Servers
+- **Loglama**: Winston
+- **HTTP Client**: Axios, Node-fetch
+- **Test**: Jest
+- **Platform**: Node.js
 
+## 📦 Kurulum
+
+### Gereksinimler
+- Node.js (v16 veya üzeri)
+- npm veya yarn
+
+### Adımlar
+
+1. **Projeyi klonlayın:**
 ```bash
-$ npm install
+git clone <repo-url>
+cd trip-planner-backend
 ```
 
-## Compile and run the project
-
+2. **Bağımlılıkları yükleyin:**
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
-
+3. **Çevre değişkenlerini ayarlayın:**
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# .env dosyası oluşturun
+PORT=3000
+# Diğer gerekli API anahtarları
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+4. **Projeyi derleyin:**
 ```bash
-$ npm install -g mau
-$ mau deploy
+npm run build
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 🎯 API Kullanımı
 
-## Resources
+### Seyahat Planı Oluşturma
 
-Check out a few resources that may come in handy when working with NestJS:
+**Endpoint**: `POST /agent/mcp`
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+**Request Body:**
+```json
+{
+  "prompt": "İstanbul'dan Paris'e 5 günlük romantik bir seyahat planı hazırla. Çıkış tarihi 15 Kasım, dönüş tarihi 20 Kasım, 2 kişi."
+}
+```
 
-## Support
+**Response:**
+```json
+{
+  "departure_flights": [
+    {
+      "id": "string",
+      "airline": "string",
+      "departure_time": "string",
+      "arrival_time": "string",
+      "price": "string"
+    }
+  ],
+  "return_flights": [...],
+  "accommodations": [...],
+  "activities": [...],
+  "attractions": [...],
+  "itinerary": [
+    {
+      "day": "Day 1",
+      "title": "string",
+      "description": "string",
+      "date": "YYYY-MM-DD",
+      "schedule": [...]
+    }
+  ],
+  "comments": "string"
+}
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Gerekli Bilgiler
 
-## Stay in touch
+Sistem aşağıdaki bilgileri talep eder:
+- 🛫 **Kalkış şehri**
+- 🏙️ **Hedef şehir**  
+- 📅 **Gidiş tarihi**
+- 📅 **Dönüş tarihi**
+- 👥 **Yolcu sayısı**
+- 🎨 **Seyahat teması** (romantik, aile, macera, kültür vb.)
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 🔧 Geliştirme
 
-## License
+### Geliştirme modunda çalıştırma:
+```bash
+# Watch mode (otomatik yeniden başlatma)
+npm run start:dev
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+# Debug mode
+npm run start:debug
+```
+
+### Production modunda çalıştırma:
+```bash
+npm run start:prod
+```
+
+### Test çalıştırma:
+```bash
+# Unit testler
+npm run test
+
+# E2E testler  
+npm run test:e2e
+
+# Test coverage
+npm run test:cov
+
+# Watch mode
+npm run test:watch
+```
+
+### Code Quality:
+```bash
+# Linting
+npm run lint
+
+# Formatting
+npm run format
+```
+
+## 📊 Loglama
+
+Sistem üç farklı log dosyası kullanır:
+
+- **`logs/application.log`**: Genel uygulama logları
+- **`logs/user-actions.log`**: Kullanıcı seçimleri ve MCP yanıtları
+- **`logs/error.log`**: Hata logları
+
+### Log Türleri:
+- `USER_SELECTION`: Kullanıcının seyahat talebini loglar
+- `MCP_RESPONSE`: MCP servislerinden gelen yanıtları loglar  
+- `MCP_ERROR`: MCP servisleriyle ilgili hataları loglar
+
+## 🏛️ Proje Yapısı
+
+```
+src/
+├── agent/              # AI Agent servisleri
+│   ├── agent.controller.ts
+│   ├── agent.service.ts
+│   └── agent.module.ts
+├── logger/             # Loglama servisleri
+│   ├── logger.service.ts
+│   └── logger.module.ts
+├── app.controller.ts   # Ana controller
+├── app.service.ts      # Ana service
+├── app.module.ts       # Ana module
+└── main.ts            # Uygulama giriş noktası
+```
+
+## 🔗 MCP Sunucuları
+
+Proje iki ana MCP sunucusu kullanır:
+
+1. **Wingie Enuygun Travel Planner** (`https://mcp.enuygun.com/mcp`)
+   - Uçuş aramaları
+   - Konaklama önerileri
+
+2. **Attraction and Activity Finder** (`https://mcp-enuygun-fs.onrender.com/mcp`)
+   - Aktivite önerileri
+   - Cazibe merkezi bilgileri
+
+## 🚀 Deployment
+
+### Development
+```bash
+npm run start:dev
+```
+
+### Production
+```bash
+npm run build
+npm run start:prod
+```
+
+## 🧪 Test Edilmiş Seyahat Senaryoları
+
+- ✅ İç hat uçuşları (İstanbul-Ankara, İstanbul-İzmir)
+- ✅ Dış hat uçuşları (İstanbul-Paris, İstanbul-Londra)
+- ✅ Romantik seyahat planları
+- ✅ Aile seyahatleri
+- ✅ Macera tatilleri
+- ✅ Kültür turları
+
+## 📝 Katkıda Bulunma
+
+1. Fork yapın
+2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
+4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
+5. Pull Request oluşturun
+
+## 📄 Lisans
+
+Bu proje UNLICENSED lisansı altındadır.
+
+## 🔧 Sorun Giderme
+
+### Yaygın Sorunlar:
+
+**1. MCP Bağlantı Hatası:**
+```
+MCP sunucularına bağlanırken hata oluştu
+```
+- Internet bağlantınızı kontrol edin
+- MCP sunucu durumlarını kontrol edin
+
+**2. JSON Parse Hatası:**
+```
+Modelden geçerli JSON gelmedi
+```
+- Prompt'unuzun tüm gerekli bilgileri içerdiğinden emin olun
+- API yanıtını loglardan kontrol edin
+
+**3. Port Çakışması:**
+```
+Port 3000 zaten kullanımda
+```
+- `.env` dosyasında farklı bir port belirleyin
+- Veya `PORT=3001 npm run start:dev` şeklinde çalıştırın
+
+## 📞 İletişim
+
+Herhangi bir sorun veya öneriniz için issue açabilirsiniz.
+
+---
+
+**🎯 Not**: Bu README Türkçe dilinde yazılmıştır ve projenin temel özelliklerini açıklamaktadır. Sistem Türkçe kullanıcı etkileşimlerini destekler ve tüm yanıtları Türkçe olarak döner.
