@@ -71,6 +71,8 @@ Response must follow this schema exactly:
   "itinerary": [
     {
       "day": "Day 1",
+      "title": "string",
+      "description": "string", 
       "date": "YYYY-MM-DD",
       "schedule": [
         {
