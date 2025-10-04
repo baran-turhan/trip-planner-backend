@@ -14,6 +14,9 @@ async function bootstrap() {
   await app.listen(port);
   
   logger.log(`🚀 Uygulama ${port} portunda çalışıyor`, 'Bootstrap');
-  logger.log(`📝 Kullanıcı seçimleri ve MCP yanıtları logs/ klasöründe kaydediliyor`, 'Bootstrap');
+  logger.log(`📝 Event-bazlı loglar logs/user-journey.log dosyasında`, 'Bootstrap');
+  logger.log(`⚠️  Uyarılar logs/warnings.log dosyasında`, 'Bootstrap');
+  logger.log(`❌ Hatalar logs/error.log dosyasında`, 'Bootstrap');
+  logger.log(`🔍 Her istek için benzersiz sessionId üretiliyor`, 'Bootstrap');
 }
 bootstrap();

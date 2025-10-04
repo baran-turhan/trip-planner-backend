@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Agent, run, MCPServerStreamableHttp } from '@openai/agents';
+import { CustomLoggerService } from '../logger/logger.service';
+import { EventType, LogLevel } from '../logger/event-types';
 
 @Injectable()
 export class AgentService {
-  async agentMCP(prompt: string) {
+  constructor(private readonly logger: CustomLoggerService) {}
+
+  async agentMCP(prompt: string, sessionId: string, clientIp?: string) {
     const enUygun = new MCPServerStreamableHttp({
       url: 'https://mcp.enuygun.com/mcp',
       name: 'Wingie Enuygun Travel Planner',
@@ -106,16 +110,156 @@ Rules:
     });
 
     try {
+      // MCP sunucularına bağlanıyoruz
+      this.logger.logEvent(
+        EventType.MCP_REQUEST_SENT,
+        sessionId,
+        {
+          action: 'Connecting to MCP servers',
+          servers: ['enUygun', 'attractionsActivites'],
+        },
+        LogLevel.INFO,
+        undefined,
+        undefined,
+        clientIp,
+      );
+
       await enUygun.connect();
       await attractionsActivites.connect();
 
+      // Agent'a istek gönderiliyor
+      const agentStartTime = Date.now();
       const result = await run(agent, prompt);
+      const agentResponseTime = Date.now() - agentStartTime;
 
+      this.logger.logEvent(
+        EventType.MCP_RESPONSE_RECEIVED,
+        sessionId,
+        {
+          action: 'Agent completed processing',
+          outputLength: result.finalOutput?.length || 0,
+        },
+        LogLevel.INFO,
+        agentResponseTime,
+        undefined,
+        clientIp,
+      );
+
+      // JSON parsing
       let parsed: any;
       try {
         parsed = JSON.parse(result.finalOutput);
+
+        // Sonuçları detaylı logla
+        if (parsed.departure_flights && parsed.departure_flights.length > 0) {
+          this.logger.logEvent(
+            EventType.FLIGHT_RESULTS_RECEIVED,
+            sessionId,
+            {
+              departureFlights: parsed.departure_flights.length,
+              returnFlights: parsed.return_flights?.length || 0,
+              sampleDepartureFlight: {
+                airline: parsed.departure_flights[0]?.airline,
+                price: parsed.departure_flights[0]?.price,
+              },
+            },
+            LogLevel.INFO,
+            undefined,
+            undefined,
+            clientIp,
+          );
+        }
+
+        if (parsed.accommodations && parsed.accommodations.length > 0) {
+          this.logger.logEvent(
+            EventType.ACCOMMODATION_RESULTS_RECEIVED,
+            sessionId,
+            {
+              count: parsed.accommodations.length,
+              locations: [...new Set(parsed.accommodations.map((a: any) => a.location))],
+              priceRange: {
+                min: Math.min(...parsed.accommodations.map((a: any) => parseFloat(a.price_per_night) || 0)),
+                max: Math.max(...parsed.accommodations.map((a: any) => parseFloat(a.price_per_night) || 0)),
+              },
+            },
+            LogLevel.INFO,
+            undefined,
+            undefined,
+            clientIp,
+          );
+        }
+
+        if (parsed.activities && parsed.activities.length > 0) {
+          this.logger.logEvent(
+            EventType.ACTIVITIES_RESULTS_RECEIVED,
+            sessionId,
+            {
+              activityCount: parsed.activities.length,
+              attractionCount: parsed.attractions?.length || 0,
+              sampleActivity: parsed.activities[0]?.name,
+            },
+            LogLevel.INFO,
+            undefined,
+            undefined,
+            clientIp,
+          );
+        }
+
+        if (parsed.itinerary && parsed.itinerary.length > 0) {
+          this.logger.logEvent(
+            EventType.ITINERARY_GENERATED,
+            sessionId,
+            {
+              days: parsed.itinerary.length,
+              totalScheduledItems: parsed.itinerary.reduce(
+                (acc: number, day: any) => acc + (day.schedule?.length || 0),
+                0,
+              ),
+              dailyBreakdown: parsed.itinerary.map((day: any) => ({
+                day: day.day,
+                date: day.date,
+                activities: day.schedule?.length || 0,
+              })),
+            },
+            LogLevel.INFO,
+            undefined,
+            undefined,
+            clientIp,
+          );
+        }
+
+        // Eksik bilgi kontrolü
+        if (parsed.comments && 
+            (parsed.comments.includes('eksik') || 
+             parsed.comments.includes('belirt') || 
+             parsed.comments.toLowerCase().includes('hangi'))) {
+          this.logger.logEvent(
+            EventType.MISSING_INFO_REQUESTED,
+            sessionId,
+            {
+              comment: parsed.comments,
+            },
+            LogLevel.WARN,
+            undefined,
+            undefined,
+            clientIp,
+          );
+        }
+
       } catch (err) {
-        console.error('JSON parse hatası:', err);
+        this.logger.logEvent(
+          EventType.MCP_ERROR,
+          sessionId,
+          {
+            error: 'JSON parse error',
+            errorMessage: err.message,
+            rawOutput: result.finalOutput?.substring(0, 200),
+          },
+          LogLevel.ERROR,
+          undefined,
+          undefined,
+          clientIp,
+        );
         throw new Error('Modelden geçerli JSON gelmedi');
       }
 
@@ -123,6 +267,18 @@ Rules:
     } finally {
       await enUygun.close();
       await attractionsActivites.close();
+
+      this.logger.logEvent(
+        EventType.MCP_RESPONSE_RECEIVED,
+        sessionId,
+        {
+          action: 'MCP connections closed',
+        },
+        LogLevel.INFO,
+        undefined,
+        undefined,
+        clientIp,
+      );
     }
   }
 }
